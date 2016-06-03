@@ -1,4 +1,4 @@
-# coupon-plugin (クーポン管理)
+# coupon-plugin (クーポン管理)2
 
 [![Build Status](https://travis-ci.org/EC-CUBE/coupon-plugin.svg?branch=master)](https://travis-ci.org/EC-CUBE/coupon-plugin)
 
