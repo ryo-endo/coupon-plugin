@@ -81,6 +81,17 @@ class Coupon extends AbstractEntity
      * @var int
      */
     private $coupon_member;
+    
+    /**
+     * @var int
+     */
+    private $use_times_limit_flag;
+
+    
+    /**
+     * @var int
+     */
+    private $use_times_limit;
 
     /**
      * @var int
@@ -485,6 +496,39 @@ class Coupon extends AbstractEntity
     public function setCouponMember($couponMember)
     {
         $this->coupon_member = $couponMember;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getUseTimesLimitFlag()
+    {
+        return $this->use_times_limit_flag;
+    }
+
+    /**
+     * @param int
+     */
+    public function setUseTimesLimitFlag($flag)
+    {
+        $this->use_times_limit_flag = $flag;
+    }
+    
+    
+    /**
+     * @return int
+     */
+    public function getUseTimesLimit()
+    {
+        return $this->use_times_limit;
+    }
+
+    /**
+     * @param int
+     */
+    public function setUseTimesLimit($limit)
+    {
+        $this->use_times_limit = $limit;
     }
 
     /**

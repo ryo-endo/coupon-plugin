@@ -50,6 +50,16 @@ Plugin\Coupon\Entity\Coupon:
             nullable: true
             unsigned: false
             default: '0'
+        use_times_limit_flag:
+            type: smallint
+            nullable: false
+            unsigned: false
+            default: '0'
+        use_times_limit:
+            type: smallint
+            nullable: true
+            unsigned: false
+            default: '1'
         coupon_lower_limit:
             type: decimal
             nullable: true

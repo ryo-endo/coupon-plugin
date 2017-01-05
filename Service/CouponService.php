@@ -528,22 +528,32 @@ class CouponService
      * @param $couponCd
      * @param Customer $Customer
      *
-     * @return bool
+     * @return bool true:制限まで利用済み, false:利用可能 
      */
     public function checkCouponUsedOrNot($couponCd, Customer $Customer)
     {
+        // 利用回数制限の取得(制限なし場合は無条件でfalseを返す)
+        $Coupon = $this->app['eccube.plugin.coupon.repository.coupon']->findOneBy(array('coupon_cd' => $couponCd));
+        $useLimit = $Coupon->getUseTimesLimitFlag();
+        if (!$useLimit) {
+            return false;
+        }
+        
+        // 利用した回数の取得
         $repository = $this->app['eccube.plugin.coupon.repository.coupon_order'];
-
         if ($this->app->isGranted('ROLE_USER')) {
             $result = $repository->findUseCoupon($couponCd, $Customer->getId());
         } else {
             $result = $repository->findUseCoupon($couponCd, $Customer->getEmail());
         }
+        $useCount = count($result);
 
-        if (!$result) {
+        // 利用回数制限のチェック
+        $limit = $Coupon->getUseTimesLimit();
+        if ($useCount < $limit) {
             return false;
         }
-
+        
         return true;
     }
 

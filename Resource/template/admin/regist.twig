@@ -171,6 +171,14 @@ $(function() {
         $("#admin_plugin_coupon_discount_price").attr('disabled', 'disabled');
         $("#admin_plugin_coupon_discount_rate").removeAttr('disabled');
     });
+    // 利用回数制限あり
+    $("#admin_plugin_coupon_use_times_limit_flag_0").on("click", function(){
+        $("#admin_plugin_coupon_use_times_limit").removeAttr('disabled');
+    });
+    // 利用回数制限なし
+    $("#admin_plugin_coupon_use_times_limit_flag_1").on("click", function(){
+        $("#admin_plugin_coupon_use_times_limit").attr('disabled', 'disabled');
+    });
     // クーポン種別 - 商品
     $("#admin_plugin_coupon_coupon_type_0").on("click", function(){
         if($("#category_area").find(".item_box").length > 0) {
@@ -223,6 +231,12 @@ $(function() {
         $("#admin_plugin_coupon_discount_rate").removeAttr('disabled');
     } else {
         $("#admin_plugin_coupon_discount_rate").attr('disabled', 'disabled');
+    }
+    // 利用回数制限
+    if($("#admin_plugin_coupon_use_times_limit_flag_0").prop('checked')) {
+        $("#admin_plugin_coupon_use_times_limit").removeAttr('disabled');
+    } else {
+        $("#admin_plugin_coupon_use_times_limit").attr('disabled', 'disabled');
     }
     // クーポン種別 - 商品
     if($("#admin_plugin_coupon_coupon_type_0").prop('checked')) {
@@ -294,6 +308,22 @@ $(function() {
                             <div class="col-sm-9 col-lg-10">
                                 {{ form_widget(form.coupon_member) }}
                                 {{ form_errors(form.coupon_member) }}
+                            </div>
+                        </div>
+                        {# 利用回数制限 #}
+                        <div class="form-group">
+                            {{ form_label(form.use_times_limit_flag) }}
+                            <div class="col-sm-9 col-lg-10">
+                                {{ form_widget(form.use_times_limit_flag) }}
+                                {{ form_errors(form.use_times_limit_flag) }}
+                            </div>
+                        </div>
+                        {# 利用可能回数 #}
+                        <div class="form-group">
+                            {{ form_label(form.use_times_limit) }}
+                            <div class="col-sm-9 col-lg-10">
+                                {{ form_widget(form.use_times_limit) }}
+                                {{ form_errors(form.use_times_limit) }}
                             </div>
                         </div>
                         {# 値引き種別 #}

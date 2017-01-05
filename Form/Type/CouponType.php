@@ -90,6 +90,28 @@ class CouponType extends AbstractType
                     new Assert\NotBlank(),
                 ),
             ))
+            ->add('use_times_limit_flag', 'choice', array(
+                'choices' => array(1 => '制限あり', 0 => '無制限'),
+                'required' => true,
+                'expanded' => true,
+                'multiple' => false,
+                'label' => '利用制限をする',
+                'empty_value' => false,
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
+            ->add('use_times_limit', 'integer', array(
+                'label' => '利用可能回数',
+                'required' => true,
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                    new Assert\Range(array(
+                        'min' => 1,
+                        'max' => 100,
+                    )),
+                ),
+            ))
             ->add('discount_type', 'choice', array(
                 'choices' => array(1 => '値引き額', 2 => '値引率'),
                 'required' => true,
