@@ -1,0 +1,97 @@
+Plugin\Coupon\Entity\CouponAvailableCondition:
+    type: entity
+    table: plg_coupon_available_condition
+    repositoryClass: Plugin\Coupon\Repository\CouponAvailableConditionRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: coupon_available_condition_id
+            generator:
+                strategy: AUTO
+    fields:
+        multi:
+            type: text
+            nullable: true
+        company_name:
+            type: text
+            nullable: true
+        birth_month:
+            type: smallint
+            nullable: true
+        birth_start:
+            type: datetime
+            nullable: true
+        birth_end:
+            type: datetime
+            nullable: true
+        tel01:
+            type: text
+            nullable: true
+        tel02:
+            type: text
+            nullable: true
+        tel03:
+            type: text
+            nullable: true
+        buy_total_start:
+            type: smallint
+            nullable: true
+        buy_total_end:
+            type: smallint
+            nullable: true
+        buy_times_start:
+            type: smallint
+            nullable: true
+        buy_times_end:
+            type: smallint
+            nullable: true
+        create_date_start:
+            type: datetime
+            nullable: true
+        create_date_end:
+            type: datetime
+            nullable: true
+        update_date_start:
+            type: datetime
+            nullable: true
+        update_date_end:
+            type: datetime
+            nullable: true
+        last_buy_start:
+            type: datetime
+            nullable: true
+        last_buy_end:
+            type: datetime
+            nullable: true
+        buy_product_name:
+            type: text
+            nullable: true
+        buy_product_code:
+            type: text
+            nullable: true
+    manyToOne:
+        Status:
+            targetEntity: Eccube\Entity\Master\CustomerStatus
+            joinColumn:
+                name: customer_status
+                referencedColumnName: id
+        Pref:
+            targetEntity: Eccube\Entity\Master\Pref
+            joinColumn:
+                name: pref
+                referencedColumnName: id
+        Sex:
+            targetEntity: Eccube\Entity\Master\Sex
+            joinColumn:
+                name: sex
+                referencedColumnName: id
+    oneToOne:
+        Coupon:
+            targetEntity: Plugin\Coupon\Entity\Coupon
+            inversedBy: CouponAvailableCondition
+            joinColumn:
+                name: coupon_id
+                referencedColumnName: coupon_id

@@ -18,6 +18,7 @@ use Plugin\Coupon\Form\Type\CouponType;
 use Plugin\Coupon\Form\Type\CouponDetailType;
 use Plugin\Coupon\Form\Type\CouponSearchCategoryType;
 use Plugin\Coupon\Form\Type\CouponUseType;
+use Plugin\Coupon\Form\Type\CouponAvailableConditionType;
 use Plugin\Coupon\Service\CouponService;
 use Plugin\Coupon\Event\Event;
 use Plugin\Coupon\Event\EventLegacy;
@@ -85,6 +86,7 @@ class CouponServiceProvider implements ServiceProviderInterface
             $types[] = new CouponDetailType($app);
             $types[] = new CouponSearchCategoryType();
             $types[] = new CouponUseType();
+            $types[] = new CouponAvailableConditionType($app);
 
             return $types;
         }));
@@ -100,6 +102,10 @@ class CouponServiceProvider implements ServiceProviderInterface
         // 受注クーポン情報テーブルリポジトリ
         $app['eccube.plugin.coupon.repository.coupon_order'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Plugin\Coupon\Entity\CouponOrder');
+        });
+        // 利用条件テーブルリポジトリ
+        $app['eccube.plugin.coupon.repository.coupon_search_condition'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Plugin\Coupon\Entity\CouponAvailableCondition');
         });
 
         // -----------------------------

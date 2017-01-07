@@ -71,6 +71,9 @@ Plugin\Coupon\Entity\Coupon:
         available_to_date:
             type: datetime
             nullable: false
+        search_condition:
+            type: text
+            nullable: true
         del_flg:
             type: smallint
             options:
@@ -89,3 +92,8 @@ Plugin\Coupon\Entity\Coupon:
             orderBy:
                 id: ASC
             cascade: ['persist', 'remove']
+    oneToOne:
+        CouponAvailableCondition:
+            targetEntity: Plugin\Coupon\Entity\CouponAvailableCondition
+            cascade: ["persist", "remove"]
+            mappedBy: Coupon

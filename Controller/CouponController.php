@@ -16,6 +16,7 @@ use Eccube\Entity\Customer;
 use Eccube\Entity\Order;
 use Eccube\Entity\Shipping;
 use Plugin\Coupon\Entity\Coupon;
+use Plugin\Coupon\Entity\CouponAvailableCondition;
 use Plugin\Coupon\Service\CouponService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,11 +68,16 @@ class CouponController
     public function edit(Application $app, Request $request, $id = null)
     {
         $Coupon = null;
+        $CouponAvailableCondition = null;
         if (!$id) {
             // 新規登録
             $Coupon = new Coupon();
             $Coupon->setEnableFlag(Constant::ENABLED);
             $Coupon->setDelFlg(Constant::DISABLED);
+            
+            // 利用条件
+            $CouponAvailableCondition = new CouponAvailableCondition();
+            $CouponAvailableCondition->setCoupon($Coupon);
         } else {
             // 更新
             $Coupon = $app['eccube.plugin.coupon.repository.coupon']->find($id);
@@ -80,6 +86,9 @@ class CouponController
 
                 return $app->redirect($app->url('plugin_coupon_list'));
             }
+            
+            //利用条件
+            $CouponAvailableCondition = $Coupon->getCouponAvailableCondition();
         }
 
         $form = $app['form.factory']->createBuilder('admin_plugin_coupon', $Coupon)->getForm();
@@ -95,7 +104,12 @@ class CouponController
         }
         $form->get('CouponDetails')->setData($details);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        
+        // 利用条件フォーム
+        $searchForm = $app['form.factory']->createBuilder('coupon_available_condition', $CouponAvailableCondition)->getForm();
+        $searchForm->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid() && $searchForm->isSubmitted() && $searchForm->isValid()) {
             /** @var \Plugin\Coupon\Entity\Coupon $Coupon */
             $Coupon = $form->getData();
             $oldReleaseNumber = $request->get('coupon_release_old');
@@ -124,7 +138,16 @@ class CouponController
                 $app['orm.em']->persist($CouponDetail);
             }
             $app['orm.em']->persist($Coupon);
+            
+            // 利用条件
+            $CouponAvailableCondition = $searchForm->getData();
+            $CouponAvailableCondition->setCoupon($Coupon);
+            $app['orm.em']->persist($CouponAvailableCondition);
+            
+            // 保存
             $app['orm.em']->flush($Coupon);
+            $app['orm.em']->flush($CouponAvailableCondition);
+            
             // 成功時のメッセージを登録する
             $app->addSuccess('admin.plugin.coupon.regist.success', 'admin');
 
@@ -132,6 +155,7 @@ class CouponController
         }
 
         return $this->renderRegistView($app, array(
+            'searchForm' => $searchForm->createView(),
             'form' => $form->createView(),
             'id' => $id,
         ));
@@ -470,4 +494,5 @@ class CouponController
             $app['orm.em']->flush($Order);
         }
     }
+    
 }

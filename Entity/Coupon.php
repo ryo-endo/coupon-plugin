@@ -73,6 +73,11 @@ class Coupon extends AbstractEntity
     private $available_to_date;
 
     /**
+     * @var string
+     */
+    private $search_condition;
+
+    /**
      * @var int
      */
     private $del_flg;
@@ -117,6 +122,20 @@ class Coupon extends AbstractEntity
      * @var \Doctrine\Common\Collections\Collection
      */
     private $CouponDetails;
+    
+    private $CouponAvailableCondition;
+    
+    public function getCouponAvailableCondition()
+    {
+        return $this->CouponAvailableCondition;
+    }
+    
+    public function setCouponAvailableCondition($CouponAvailableCondition)
+    {
+        $this->CouponAvailableCondition = $CouponAvailableCondition;
+
+        return $this;
+    }
 
     /**
      * Constructor.
@@ -561,5 +580,21 @@ class Coupon extends AbstractEntity
     public function setCouponRelease($coupon_release)
     {
         $this->coupon_release = $coupon_release;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSearchCondition()
+    {
+        return $this->search_condition;
+    }
+
+    /**
+     * @param string $search_condition
+     */
+    public function setSearchCondition($search_condition)
+    {
+        $this->search_condition = $search_condition;
     }
 }

@@ -11,6 +11,8 @@
 
 {% set menus = ['order', 'plugin_coupon'] %}
 
+{% form_theme searchForm 'Form/bootstrap_3_horizontal_layout.html.twig' %}
+
 {% block title %}クーポン管理{% endblock %}
 {% block sub_title %}クーポン内容設定{% endblock %}
 
@@ -251,6 +253,8 @@ $(function() {
         $("#category_area").hide();
     }
 
+
+
     var inputDate = document.createElement('input');
     inputDate.setAttribute('type', 'date');
     if (inputDate.type !== 'date') {
@@ -270,7 +274,7 @@ $(function() {
     <form role="form" name="form1" id="form1" method="post" action="">
     <input type="hidden" name="mode" value="">
     {{ form_widget(form._token) }}
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="box accordion">
                 <div class="box-header toggle active">
                     <h3 class="box-title">クーポン情報<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
@@ -310,6 +314,7 @@ $(function() {
                                 {{ form_errors(form.coupon_member) }}
                             </div>
                         </div>
+
                         {# 利用回数制限 #}
                         <div class="form-group">
                             {{ form_label(form.use_times_limit_flag) }}
@@ -454,11 +459,101 @@ $(function() {
                 </div>
             </div>
 
-{#
-            // ===================================
-            // カテゴリ一覧
-            // ===================================
-#}
+            {# 利用条件 #}
+            <div class="box accordion">
+                <div class="box-header toggle">
+                    <h3 class="box-title">利用条件<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
+                </div><!-- /.box-header -->
+                <div class="box-body accpanel">
+                    {{ form_widget(searchForm._token) }}
+                    <!--検索条件設定テーブルここから-->
+                    <div id="search_wrap" class="search-box">
+                        <div class="row">
+                            <div id="search_box_main__body_inner" class="col-sm-12 col-lg-12 search">
+                                <div class="col-xs-6 col-md-4">
+                                    <div id="search_box_main__sex" class="form-group">
+                                        <label>性別</label>
+                                        {{ form_widget(searchForm.sex) }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-4">
+                                    <div id="search_box_main__birth_month" class="form-group">
+                                        <label>誕生月</label>
+                                        {{ form_widget(searchForm.birth_month) }}
+                                    </div>
+                                </div>
+                                <div id="search_box_main__birth" class="col-xs-12 col-sm-12 col-md-6">
+                                    <label>誕生日</label>
+                                    <div class="form-group range">
+                                        {{ form_widget(searchForm.birth_start, {'attr': {'class': 'input_cal'}}) }} ～ {{ form_widget(searchForm.birth_end, {'attr': {'class': 'input_cal'}}) }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div id="search_box_main__pref" class="form-group">
+                                        <label>都道府県</label>
+                                        {{ form_widget(searchForm.pref) }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-sm-6">
+                                    <div id="search_box_main__tel" class="form-group">
+                                        <label>電話番号</label>
+                                        {{ form_widget(searchForm.tel) }}
+                                        {{ form_errors(searchForm.tel) }}
+                                    </div>
+                                </div>
+                                <div id="search_box_main__crate_date" class="col-xs-12 col-sm-6">
+                                    <label>登録日</label>
+                                    <div class="form-group range">
+                                        {{ form_widget(searchForm.create_date_start, {'attr': {'class': 'input_cal'}}) }} ～ {{ form_widget(searchForm.create_date_end, {'attr': {'class': 'input_cal'}}) }}
+                                    </div>
+                                </div>
+                                <div id="search_box_main__update_date" class="col-xs-12 col-sm-6">
+                                    <label>更新日</label>
+                                    <div class="form-group range">
+                                        {{ form_widget(searchForm.update_date_start, {'attr': {'class': 'input_cal'}}) }} ～ {{ form_widget(searchForm.update_date_end, {'attr': {'class': 'input_cal'}}) }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div id="search_box_main__buy_total" class="form-group range">
+                                        <label>購入金額</label>
+                                        {{ form_widget(searchForm.buy_total_start) }} ～ {{ form_widget(searchForm.buy_total_end) }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div id="search_box_main__buy_times" class="form-group range">
+                                        <label>購入回数</label>
+                                        {{ form_widget(searchForm.buy_times_start) }} ～ {{ form_widget(searchForm.buy_times_end) }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-12 col-md-6">
+                                    <div id="search_box_main__buy_product_code" class="form-group">
+                                        <label>購入商品名・コード</label>
+                                        {{ form_widget(searchForm.buy_product_code) }}
+                                    </div>
+                                </div>
+                                <div id="search_box_main__last_buy" class="col-xs-12 col-sm-12 col-md-6">
+                                    <label>最終購入日</label>
+                                    <div class="form-group range">
+                                        {{ form_widget(searchForm.last_buy_start, {'attr': {'class': 'input_cal'}}) }} ～ {{ form_widget(searchForm.last_buy_end, {'attr': {'class': 'input_cal'}}) }}
+                                    </div>
+                                </div>
+                                <div class="extra-form col-xs-12 col-sm-12">
+                                    {% for f in searchForm.getIterator %}
+                                        {% if f.vars.name matches '[^plg*]' %}
+                                            <div class="form-group">
+                                                {{ form_label(f) }}
+                                                {{ form_widget(f) }}
+                                                {{ form_errors(f) }}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="box accordion" id="category_area">
                 <div class="box-header toggle">
                     <h3 class="box-title">カテゴリ情報<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
