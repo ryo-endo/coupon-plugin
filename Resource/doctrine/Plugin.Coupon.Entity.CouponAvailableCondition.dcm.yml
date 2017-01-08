@@ -8,7 +8,7 @@ Plugin\Coupon\Entity\CouponAvailableCondition:
             nullable: false
             unsigned: false
             id: true
-            column: coupon_available_condition_id
+            column: coupon_available_id
             generator:
                 strategy: AUTO
     fields:
