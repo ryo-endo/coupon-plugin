@@ -88,7 +88,12 @@ function fnDelete(action) {
 
                                     <td>{{ Coupon.coupon_use_time|number_format }} / {{ Coupon.coupon_release|number_format }}</td>
                                     <td>{{ Coupon.coupon_lower_limit|price }}</td>
-                                    <td>{{ Coupon.available_from_date|date_format }} ～ {{ Coupon.available_to_date|date_format }}</td>
+                                    
+                                    {% if Coupon.no_expire_date %}
+                                        <td>無期限</td>
+                                    {% else %}
+                                        <td>{{ Coupon.available_from_date|date_format }} ～ {{ Coupon.available_to_date|date_format }}</td>
+                                    {% endif %}
 
                                     <td><a href="{{ url('plugin_coupon_edit', { id: Coupon.id }) }}">編集</a></td>
                                     <td>
