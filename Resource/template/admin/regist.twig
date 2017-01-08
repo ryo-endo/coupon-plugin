@@ -175,11 +175,13 @@ $(function() {
     });
     // 利用回数制限あり
     $("#admin_plugin_coupon_use_times_limit_flag_0").on("click", function(){
+        $("#admin_plugin_coupon_use_times_limit").attr('required', 'required');
         $("#admin_plugin_coupon_use_times_limit").removeAttr('disabled');
     });
     // 利用回数制限なし
     $("#admin_plugin_coupon_use_times_limit_flag_1").on("click", function(){
         $("#admin_plugin_coupon_use_times_limit").attr('disabled', 'disabled');
+        $("#admin_plugin_coupon_use_times_limit").removeAttr('required');
     });
     // クーポン種別 - 商品
     $("#admin_plugin_coupon_coupon_type_0").on("click", function(){
@@ -236,9 +238,11 @@ $(function() {
     }
     // 利用回数制限
     if($("#admin_plugin_coupon_use_times_limit_flag_0").prop('checked')) {
+        $("#admin_plugin_coupon_use_times_limit").attr('required', 'required');
         $("#admin_plugin_coupon_use_times_limit").removeAttr('disabled');
     } else {
         $("#admin_plugin_coupon_use_times_limit").attr('disabled', 'disabled');
+        $("#admin_plugin_coupon_use_times_limit").removeAttr('required');
     }
     // クーポン種別 - 商品
     if($("#admin_plugin_coupon_coupon_type_0").prop('checked')) {

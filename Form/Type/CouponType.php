@@ -103,9 +103,8 @@ class CouponType extends AbstractType
             ))
             ->add('use_times_limit', 'integer', array(
                 'label' => '利用可能回数',
-                'required' => true,
+                'required' => false,
                 'constraints' => array(
-                    new Assert\NotBlank(),
                     new Assert\Range(array(
                         'min' => 1,
                         'max' => 100,
@@ -256,6 +255,20 @@ class CouponType extends AbstractType
                     }
                     if ($count > 0) {
                         $form['coupon_cd']->addError(new FormError($app->trans('admin.plugin.coupon.duplicate')));
+                    }
+                }
+                
+                // 利用回数制限ありの場合は、制限回数の入力が必要
+                if ($data['use_times_limit_flag'] == 1) {
+                    // 値引き額
+                    /** @var ConstraintViolationList $errors */
+                    $errors = $app['validator']->validateValue($data['use_times_limit'], array(
+                        new Assert\NotBlank(),
+                    ));
+                    if ($errors->count() > 0) {
+                        foreach ($errors as $error) {
+                            $form['use_times_limit']->addError(new FormError($error->getMessage()));
+                        }
                     }
                 }
             });
