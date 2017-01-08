@@ -52,6 +52,10 @@ class CouponRepository extends EntityRepository
         // 有効期間(TO)
         $qb->andWhere(':cur_date_time <= c.available_to_date OR c.available_to_date IS NULL')
             ->setParameter('cur_date_time', $currenDateTime);
+        
+        // 有効期間 無期限
+        $qb->orWhere('c.no_expire_date = :no_expire_date')
+            ->setParameter('no_expire_date', Constant::ENABLED);
 
         // 実行
         $result = null;
