@@ -51,7 +51,7 @@ class CouponAvailableConditionType extends AbstractType
             ->add('birth_month', 'choice', array(
                 'label' => '誕生月',
                 'required' => false,
-                'choices' => array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+                'choices' => array_combine(range(1, 12), range(1, 12)),
             ))
             ->add('birth_start', 'birthday', array(
                 'label' => '誕生日',
