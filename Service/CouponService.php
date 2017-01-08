@@ -15,9 +15,11 @@ use Eccube\Common\Constant;
 use Eccube\Entity\Customer;
 use Eccube\Entity\Order;
 use Eccube\Entity\OrderDetail;
+use Eccube\Util\Str;
 use Plugin\Coupon\Entity\Coupon;
 use Plugin\Coupon\Entity\CouponDetail;
 use Plugin\Coupon\Entity\CouponOrder;
+use Plugin\Coupon\Entity\CouponAvailableCondition;
 use Eccube\Entity\Category;
 
 /**
@@ -663,5 +665,157 @@ class CouponService
         $Coupon = $app['eccube.plugin.coupon.repository.coupon']->findOneBy(array('coupon_cd' => $couponCd));
         // クーポンの発行枚数は購入完了時に減算される、一枚以上残っていれば利用できる
         return $Coupon->getCouponUseTime() >= 1;
+    }
+    
+    /**
+     *  クーポンの利用条件に当てはまるかの確認
+     *
+     * @param string $couponCd
+     * @param Customer $Customer
+     *
+     * @return bool true:利用可能
+     */
+    public function checkCouponAvailableCondition($couponCd, Customer $Customer)
+    {
+        $Coupon = $this->app['eccube.plugin.coupon.repository.coupon']->findOneBy(array('coupon_cd' => $couponCd));
+        $searchData = $Coupon->getCouponAvailableCondition();
+        
+        // 利用条件のクエリ生成
+        // CustomerRepositoryクラスのgetQueryBuilderBySearchData関数を流用。
+        $qb = $this->app['eccube.repository.customer']->createQueryBuilder('c')
+            ->select('c')
+            ->andWhere('c.del_flg = 0');
+            
+        // 会員ID(この会員がすべての条件を満たしていれば利用OK)
+        $qb->andWhere('c.id >= :id')
+            ->setParameter('id', $Customer->getId());
+        // 都道府県
+        if (!empty($searchData['pref']) && $searchData['pref']) {
+            $qb
+                ->andWhere('c.Pref = :pref')
+                ->setParameter('pref', $searchData['pref']->getId());
+        }
+        // 性別
+        if (!empty($searchData['sex']) && $searchData['sex']) {
+            $qb
+                ->andWhere('c.Sex = :sex')
+                ->setParameter('sex', $searchData['sex']);
+        }
+        // 誕生月
+        if (!empty($searchData['birth_month']) && $searchData['birth_month']) {
+            $qb
+                ->andWhere('EXTRACT(MONTH FROM c.birth) = :birth_month')
+                ->setParameter('birth_month', $searchData['birth_month']);
+        }
+        // 誕生日(xxx～xxx)
+        if (!empty($searchData['birth_start']) && $searchData['birth_start']) {
+            $date = $searchData['birth_start']
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.birth >= :birth_start')
+                ->setParameter('birth_start', $date);
+        }
+        if (!empty($searchData['birth_end']) && $searchData['birth_end']) {
+            $date = clone $searchData['birth_end'];
+            $date = $date
+                ->modify('+1 days')
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.birth < :birth_end')
+                ->setParameter('birth_end', $date);
+        }
+        // 電話番号
+        if (isset($searchData['tel']) && Str::isNotBlank($searchData['tel'])) {
+            $qb
+                ->andWhere('CONCAT(c.tel01, c.tel02, c.tel03) LIKE :tel')
+                ->setParameter('tel', '%' . $searchData['tel'] . '%');
+        }
+        // 購入金額(xxx～xxx)
+        if (isset($searchData['buy_total_start']) && Str::isNotBlank($searchData['buy_total_start'])) {
+            $qb
+                ->andWhere('c.buy_total >= :buy_total_start')
+                ->setParameter('buy_total_start', $searchData['buy_total_start']);
+        }
+        if (isset($searchData['buy_total_end']) && Str::isNotBlank($searchData['buy_total_end'])) {
+            $qb
+                ->andWhere('c.buy_total <= :buy_total_end')
+                ->setParameter('buy_total_end', $searchData['buy_total_end']);
+        }
+        // 購入回数(xxx～xxx)
+        if (!empty($searchData['buy_times_start']) && $searchData['buy_times_start']) {
+            $qb
+                ->andWhere('c.buy_times >= :buy_times_start')
+                ->setParameter('buy_times_start', $searchData['buy_times_start']);
+        }
+        if (!empty($searchData['buy_times_end']) && $searchData['buy_times_end']) {
+            $qb
+                ->andWhere('c.buy_times <= :buy_times_end')
+                ->setParameter('buy_times_end', $searchData['buy_times_end']);
+        }
+        // 登録日(xxx～xxx)
+        if (!empty($searchData['create_date_start']) && $searchData['create_date_start']) {
+            $date = $searchData['create_date_start']
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.create_date >= :create_date_start')
+                ->setParameter('create_date_start', $date);
+        }
+        if (!empty($searchData['create_date_end']) && $searchData['create_date_end']) {
+            $date = clone $searchData['create_date_end'];
+            $date = $date
+                ->modify('+1 days')
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.create_date < :create_date_end')
+                ->setParameter('create_date_end', $date);
+        }
+        // 更新日(xxx～xxx)
+        if (!empty($searchData['update_date_start']) && $searchData['update_date_start']) {
+            $date = $searchData['update_date_start']
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.update_date >= :update_date_start')
+                ->setParameter('update_date_start', $date);
+        }
+        if (!empty($searchData['update_date_end']) && $searchData['update_date_end']) {
+            $date = clone $searchData['update_date_end'];
+            $date = $date
+                ->modify('+1 days')
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.update_date < :update_date_end')
+                ->setParameter('update_date_end', $date);
+        }
+        // 最終購入日(xxx～xxx)
+        if (!empty($searchData['last_buy_start']) && $searchData['last_buy_start']) {
+            $date = $searchData['last_buy_start']
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.last_buy_date >= :last_buy_start')
+                ->setParameter('last_buy_start', $date);
+        }
+        if (!empty($searchData['last_buy_end']) && $searchData['last_buy_end']) {
+            $date = clone $searchData['last_buy_end'];
+            $date = $date
+                ->modify('+1 days')
+                ->format('Y-m-d H:i:s');
+            $qb
+                ->andWhere('c.last_buy_date < :last_buy_end')
+                ->setParameter('last_buy_end', $date);
+        }
+        // 購入商品名・コード
+        if (isset($searchData['buy_product_code']) && Str::isNotBlank($searchData['buy_product_code'])) {
+            $qb
+                ->leftJoin('c.Orders', 'o')
+                ->leftJoin('o.OrderDetails', 'od')
+                ->andWhere('od.product_name LIKE :buy_product_name OR od.product_code LIKE :buy_product_name')
+                ->setParameter('buy_product_name', '%' . $searchData['buy_product_code'] . '%');
+        }
+        
+        // 条件に当てはまればクーポン利用可能
+        $Customers = $qb->getQuery()->getResult();
+        $isAvailable = count($Customers) > 0;
+        
+        return $isAvailable;
     }
 }

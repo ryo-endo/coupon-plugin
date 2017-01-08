@@ -17,3 +17,4 @@ front.plugin.coupon.shopping.use.minus: クーポン利用時の合計金額が�
 front.plugin.coupon.shopping.member: このクーポンは会員のみクーポンです。
 front.plugin.coupon.shopping.lowerlimit: このクーポンの下限金額より低いです。
 front.plugin.coupon.shopping.notfound: このクーポンを利用できない。
+front.plugin.coupon.shopping.notavailable: お客様はこのクーポンを利用できません。

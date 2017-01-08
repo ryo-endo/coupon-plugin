@@ -291,7 +291,7 @@ class CouponController
             // ----------------------------------
             if ($formCouponCd == $couponCd) {
                 // 画面上のクーポンコードと既に登録済みのクーポンコードが同一の場合、何もしない
-                return $app->redirect($app->url('shopping'));
+                //return $app->redirect($app->url('shopping'));
             }
 
             if ($formCouponCancel == 0 && $couponCd) {
@@ -339,6 +339,13 @@ class CouponController
 
                     if (!$checkLowerLimit) {
                         $form->get('coupon_cd')->addError(new FormError('front.plugin.coupon.shopping.lowerlimit'));
+                        $error = true;
+                    }
+
+                    // クーポンの利用条件に当てはまるかのチェック
+                    $isAvailable = $service->checkCouponAvailableCondition($formCouponCd, $Customer);
+                    if (!$isAvailable && $existCoupon) {
+                        $form->get('coupon_cd')->addError(new FormError('front.plugin.coupon.shopping.notavailable'));
                         $error = true;
                     }
 
