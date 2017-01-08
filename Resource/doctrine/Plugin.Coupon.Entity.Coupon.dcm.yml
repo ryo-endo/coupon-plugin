@@ -65,12 +65,17 @@ Plugin\Coupon\Entity\Coupon:
             nullable: true
             precision: 10
             scale: 0
+        no_expire_date:
+            type: smallint
+            nullable: false
+            unsigned: false
+            default: false
         available_from_date:
             type: datetime
-            nullable: false
+            nullable: true
         available_to_date:
             type: datetime
-            nullable: false
+            nullable: true
         search_condition:
             type: text
             nullable: true

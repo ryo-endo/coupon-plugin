@@ -20,6 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Eccube\Application;
+use Eccube\Form\DataTransformer;
 
 /**
  * Class CouponType.
@@ -67,7 +68,6 @@ class CouponType extends AbstractType
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),
-                'data' => 'クーポン名',
             ))
             ->add('coupon_type', 'choice', array(
                 'choices' => array(1 => '商品', 2 => 'カテゴリ', 3 => '全商品'),
@@ -79,7 +79,6 @@ class CouponType extends AbstractType
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),
-                'data' => 3
             ))
             ->add('coupon_member', 'choice', array(
                 'choices' => array(1 => 'YES', 0 => 'NO'),
@@ -102,7 +101,6 @@ class CouponType extends AbstractType
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),
-                'data' => 0,
             ))
             ->add('use_times_limit', 'integer', array(
                 'label' => '利用可能回数',
@@ -134,7 +132,6 @@ class CouponType extends AbstractType
                         'min' => 0,
                     )),
                 ),
-                'data' => 0,
             ))
             ->add('discount_price', 'money', array(
                 'label' => '値引き額',
@@ -157,31 +154,28 @@ class CouponType extends AbstractType
                     )),
                 ),
             ))
+            ->add('no_expire_date', 'checkbox', array(
+                'label' => '無制限',
+                'value' => '1',
+                'required' => false,
+            ))
             // 有効期間(FROM)
             ->add('available_from_date', 'date', array(
                 'label' => '有効期間',
-                'required' => true,
+                'required' => false,
                 'input' => 'datetime',
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd',
                 'empty_value' => array('year' => '----', 'month' => '--', 'day' => '--'),
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                ),
-                'data' => new \DateTime(),
             ))
             // 有効期間(TO)
             ->add('available_to_date', 'date', array(
                 'label' => '有効期間日(TO)',
-                'required' => true,
+                'required' => false,
                 'input' => 'datetime',
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd',
                 'empty_value' => array('year' => '----', 'month' => '--', 'day' => '--'),
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                ),
-                'data' => new \DateTime(),
             ))
             ->add('coupon_release', 'integer', array(
                 'label' => '発行枚数',
@@ -277,7 +271,32 @@ class CouponType extends AbstractType
                         }
                     }
                 }
+                
+                // 有効期間が無制限でない場合は、期間の入力が必要
+                if ($data['no_expire_date'] == false) {
+                    // 値引き額
+                    /** @var ConstraintViolationList $errors */
+                    $errors = $app['validator']->validateValue($data['available_from_date'], array(
+                        new Assert\NotBlank(),
+                    ));
+                    if ($errors->count() > 0) {
+                        foreach ($errors as $error) {
+                            $form['available_from_date']->addError(new FormError($error->getMessage()));
+                        }
+                    }
+                    $errors = $app['validator']->validateValue($data['available_to_date'], array(
+                        new Assert\NotBlank(),
+                    ));
+                    if ($errors->count() > 0) {
+                        foreach ($errors as $error) {
+                            $form['available_to_date']->addError(new FormError($error->getMessage()));
+                        }
+                    }
+                }
             });
+        
+        // 型変換(checkboxはbool型を要求するが、DBにはint型で保持しているため)
+        $builder->get('no_expire_date')->addModelTransformer(new DataTransformer\IntegerToBooleanTransformer());
     }
 
     /**

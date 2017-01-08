@@ -597,4 +597,32 @@ class Coupon extends AbstractEntity
     {
         $this->search_condition = $search_condition;
     }
+    /**
+     * @var integer
+     */
+    private $no_expire_date;
+
+
+    /**
+     * Set no_expire_date
+     *
+     * @param integer $noExpireDate
+     * @return Coupon
+     */
+    public function setNoExpireDate($noExpireDate)
+    {
+        $this->no_expire_date = $noExpireDate;
+
+        return $this;
+    }
+
+    /**
+     * Get no_expire_date
+     *
+     * @return integer 
+     */
+    public function getNoExpireDate()
+    {
+        return $this->no_expire_date;
+    }
 }

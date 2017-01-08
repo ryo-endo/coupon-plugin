@@ -220,6 +220,22 @@ $(function() {
         $("#product_area").hide();
         $("#category_area").hide();
     });
+    
+    // 利用期間 無期限
+    $("#admin_plugin_coupon_no_expire_date").on("click", function(){
+        if ($(this).is(':checked')) {
+            $("#admin_plugin_coupon_available_from_date").removeAttr('required');
+            $("#admin_plugin_coupon_available_from_date").attr('disabled', 'disabled');
+            $("#admin_plugin_coupon_available_to_date").removeAttr('required');
+            $("#admin_plugin_coupon_available_to_date").attr('disabled', 'disabled');
+        } else {
+            $("#admin_plugin_coupon_available_from_date").attr('required', 'required');
+            $("#admin_plugin_coupon_available_from_date").removeAttr('disabled');
+            $("#admin_plugin_coupon_available_to_date").attr('required', 'required');
+            $("#admin_plugin_coupon_available_to_date").removeAttr('disabled');
+        }
+        
+    });
 
     // ==========================
     // 初期処理
@@ -256,7 +272,18 @@ $(function() {
     } else {
         $("#category_area").hide();
     }
-
+    // 利用期間
+    if($("#admin_plugin_coupon_no_expire_date").prop('checked')) {
+        $("#admin_plugin_coupon_available_from_date").removeAttr('required');
+        $("#admin_plugin_coupon_available_from_date").attr('disabled', 'disabled');
+        $("#admin_plugin_coupon_available_to_date").removeAttr('required');
+        $("#admin_plugin_coupon_available_to_date").attr('disabled', 'disabled');
+    } else {
+        $("#admin_plugin_coupon_available_from_date").attr('required', 'required');
+        $("#admin_plugin_coupon_available_from_date").removeAttr('disabled');
+        $("#admin_plugin_coupon_available_to_date").attr('required', 'required');
+        $("#admin_plugin_coupon_available_to_date").removeAttr('disabled');
+    }
 
 
     var inputDate = document.createElement('input');
@@ -382,10 +409,14 @@ $(function() {
                         <div class="form-group">
                             {{ form_label(form.available_from_date) }}
                             <div class="col-sm-9 col-lg-10">
-                                <div class="form-group range">
-                                    {{ form_widget(form.available_from_date) }}～{{ form_widget(form.available_to_date) }}
-                                    {{ form_errors(form.available_from_date) }}
-                                    {{ form_errors(form.available_to_date) }}
+                                <div class="row">
+                                    <div class="range form-inline">
+                                        {{ form_widget(form.available_from_date) }} ～ {{ form_widget(form.available_to_date) }}
+                                        {{ form_widget(form.no_expire_date) }}
+                                        {{ form_errors(form.available_from_date) }}
+                                        {{ form_errors(form.available_to_date) }}
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
