@@ -270,21 +270,54 @@ class CouponController
 
             return $app->redirect($app->url('shopping_error'));
         }
-        $form = $app['form.factory']->createBuilder('front_plugin_coupon_shopping')->getForm();
-        // クーポンコードを取得する
+        
+        // 利用可能なクーポン一覧
+        $Coupons = null;
+        if ($app->isGranted('ROLE_USER')) {
+            $Coupons = $app['eccube.plugin.coupon.repository.coupon']->findActiveCouponAllByCustomer($app, $app->user());
+        } else {
+            //TODO 
+        }
+        
+        $form = $app['form.factory']->createBuilder('front_plugin_coupon_shopping', null, array('coupons' => $Coupons))->getForm();
+        
+        // 利用中のクーポンコードがある場合はフォームに設定する
         $CouponOrder = $app['eccube.plugin.coupon.service.coupon']->getCouponOrder($Order->getPreOrderId());
         $couponCd = null;
         if ($CouponOrder) {
             $couponCd = $CouponOrder->getCouponCd();
+            $selectedCoupon = $app['eccube.plugin.coupon.repository.coupon']->findOneBy(array('coupon_cd' => $couponCd));
+            
+            // クーポンコードがクーポン一覧にあるか？
+            $fromChoices = $form->get('coupon_select')->getConfig()->getOption('choices');
+            $hasChoice = false;
+            foreach ($fromChoices as $Choice) {
+                if ($Choice->getCouponCd() == $couponCd) {
+                    $hasChoice = true;
+                    break;
+                }
+            }
+            
+            // フォームに設定する
+            if ($hasChoice) {
+                $form->get('coupon_select')->setData($selectedCoupon);
+            } else {
+                $form->get('coupon_cd')->setData($couponCd);
+            }
         }
-
-        $form->get('coupon_cd')->setData($couponCd);
+        
+        
+        
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // サービスの取得
             /* @var $service CouponService */
             $service = $app['eccube.plugin.coupon.service.coupon'];
-            $formCouponCd = $form->get('coupon_cd')->getData();
+            if (!is_null($form->get('coupon_select')->getData())) {
+                $formCouponCd = $form->get('coupon_select')->getData()->getCouponCd();
+            } else {
+                $formCouponCd = $form->get('coupon_cd')->getData();
+            }
             $formCouponCancel = $form->get('coupon_use')->getData();
             // ---------------------------------
             // クーポンコード入力項目追加
@@ -294,8 +327,8 @@ class CouponController
                 //return $app->redirect($app->url('shopping'));
             }
 
-            if ($formCouponCancel == 0 && $couponCd) {
-                // 画面上のクーポンコードが入力されておらず、既にクーポンコードが登録されていればクーポンを無効にする
+            if ($formCouponCancel == 0 || empty($formCouponCd)) {
+                // クーポンを利用しない OR クーポンの入力がない場合は、Orderからクーポンを削除
                 $this->removeCouponOrder($Order, $app);
 
                 return $app->redirect($app->url('shopping'));

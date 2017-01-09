@@ -11,7 +11,10 @@
 namespace Plugin\Coupon\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Eccube\Application;
+use Eccube\Entity\Customer;
 use Eccube\Common\Constant;
+use Plugin\Coupon\Service\CouponService;
 
 /**
  * CouponRepository.
@@ -45,18 +48,16 @@ class CouponRepository extends EntityRepository
         $qb->andWhere('c.enable_flag = :enable_flag')
             ->setParameter('enable_flag', Constant::ENABLED);
 
-        // 有効期間(FROM)
-        $qb->andWhere('c.available_from_date <= :cur_date_time OR c.available_from_date IS NULL')
-            ->setParameter('cur_date_time', $currenDateTime);
-
-        // 有効期間(TO)
-        $qb->andWhere(':cur_date_time <= c.available_to_date OR c.available_to_date IS NULL')
-            ->setParameter('cur_date_time', $currenDateTime);
+        // 有効期限内 or 無期限
+        $qb->andWhere(
+            $qb->expr()->orX(
+                $qb->expr()->between(':cur_date_time', 'c.available_from_date', 'c.available_to_date'),
+                $qb->expr()->eq('c.no_expire_date', ':no_expire_date')
+            )
+        )
+        ->setParameter('cur_date_time', $currenDateTime)
+        ->setParameter('no_expire_date', Constant::ENABLED);
         
-        // 有効期間 無期限
-        $qb->orWhere('c.no_expire_date = :no_expire_date')
-            ->setParameter('no_expire_date', Constant::ENABLED);
-
         // 実行
         $result = null;
         $results = $qb->getQuery()->getResult();
@@ -95,5 +96,26 @@ class CouponRepository extends EntityRepository
 
         // 実行
         return $qb->getQuery()->getResult();
+    }
+    
+    /**
+     * 会員が有効なクーポンを全取得する.
+     *
+     * @return array
+     */
+    public function findActiveCouponAllByCustomer(Application $app, Customer $Customer)
+    {
+        // 有効なクーポンを取得
+        $ActiveCoupons = $this->findActiveCouponAll();
+        
+        $ActiveCouponsByCustomer = array();
+        foreach ($ActiveCoupons as $Coupon) {
+            $isAvailable = $app['eccube.plugin.coupon.service.coupon']->checkCouponAvailableCondition($Coupon->getCouponCd(), $Customer);
+            if ($isAvailable) {
+                $ActiveCouponsByCustomer[] = $Coupon;
+            }
+        }
+        
+        return $ActiveCouponsByCustomer;
     }
 }

@@ -18,6 +18,14 @@ use Eccube\Entity\AbstractEntity;
 class Coupon extends AbstractEntity
 {
     /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getCouponName() ? $this->getCouponName() : '';
+    }
+    
+    /**
      * @var int
      */
     private $id;

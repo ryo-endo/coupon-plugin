@@ -16,9 +16,11 @@
     $(function() {
         $('input[name~="front_plugin_coupon_shopping[coupon_use]"]').change(function () {
             if($(this).val() == 0) {
-                $('#front_plugin_coupon_shopping_coupon_cd').attr('disabled', '');
+                $('#front_plugin_coupon_shopping_coupon_cd').attr('disabled', 'true');
+                $('#{{ form.coupon_select.vars.id }}').attr('disabled', 'true');
             } else {
                 $('#front_plugin_coupon_shopping_coupon_cd').removeAttr('disabled');
+                $('#{{ form.coupon_select.vars.id }}').removeAttr('disabled');
             }
         });
     });
@@ -45,6 +47,15 @@
                                 {{ form_widget(form.coupon_cd) }}
                                 {{ form_errors(form.coupon_cd) }}
                             </dd>
+                            
+                        </dl>
+                        <dl id="coupon_box__cd">
+                            <dt>利用可能なクーポン</dt>
+                            <dd class="form-group">
+                                {{ form_widget(form.coupon_select) }}
+                                {{ form_errors(form.coupon_select) }}
+                            </dd>
+                            
                         </dl>
                         </div>
                     <div id="coupon_box_footer" class="row no-padding">

@@ -12,6 +12,8 @@ namespace Plugin\Coupon\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * Class CouponUseType.
@@ -26,6 +28,8 @@ class CouponUseType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $Coupons = $options['coupons'];
+        
         $builder
             ->add('coupon_cd', 'text', array(
                 'label' => 'クーポンコード',
@@ -41,7 +45,23 @@ class CouponUseType extends AbstractType
                 'label' => '',
                 'data' => 1,
                 'empty_value' => false,
-            ));
+            ))
+            ->add('coupon_select', 'entity', array(
+                'required' => false,
+                'expanded' => false,
+                'multiple' => false,
+                'empty_value' => '利用するクーポンを選択して下さい',
+                'empty_data'  => null,
+                'class' => 'Plugin\Coupon\Entity\Coupon',
+                'choices' => $Coupons,
+                ));
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'coupons' => array(),
+        ));
     }
 
     /**
