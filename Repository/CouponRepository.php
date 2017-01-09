@@ -123,4 +123,29 @@ class CouponRepository extends EntityRepository
 
         return $ActiveCouponsByCustomer;
     }
+    
+    /**
+     * ゲストが選択可能なクーポンを全取得する.
+     *
+     * @return array
+     */
+    public function findSelectableCouponAllByGuest()
+    {
+        // 有効なクーポンを取得
+        $ActiveCoupons = $this->findActiveCouponAll();
+        
+        // 利用条件で絞り込み
+        $SelectableCoupon = array();
+        foreach ($ActiveCoupons as $Coupon) {
+            if ($Coupon->getCouponMember()) {
+                continue;
+            }
+            if (!$Coupon->getSelectable()) {
+               continue;
+            }
+            $SelectableCoupon[] = $Coupon;
+        }
+
+        return $SelectableCoupon;
+    }
 }

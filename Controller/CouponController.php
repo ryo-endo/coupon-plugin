@@ -274,9 +274,9 @@ class CouponController
         // 利用可能なクーポン一覧
         $Coupons = null;
         if ($app->isGranted('ROLE_USER')) {
-            $Coupons = $app['eccube.plugin.coupon.repository.coupon']->findSelectableCouponAllByCustomer($app, $app->user(), true);
+            $Coupons = $app['eccube.plugin.coupon.repository.coupon']->findSelectableCouponAllByCustomer($app, $app->user());
         } else {
-            //TODO 
+            $Coupons = $app['eccube.plugin.coupon.repository.coupon']->findSelectableCouponAllByGuest();
         }
         
         $form = $app['form.factory']->createBuilder('front_plugin_coupon_shopping', null, array('coupons' => $Coupons))->getForm();
