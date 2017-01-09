@@ -376,10 +376,12 @@ class CouponController
                     }
 
                     // クーポンの利用条件に当てはまるかのチェック
-                    $isAvailable = $service->checkCouponAvailableCondition($formCouponCd, $Customer);
-                    if (!$isAvailable && $existCoupon) {
-                        $form->get('coupon_cd')->addError(new FormError('front.plugin.coupon.shopping.notavailable'));
-                        $error = true;
+                    if ($app->isGranted('ROLE_USER')) {
+                        $isAvailable = $service->checkCouponAvailableCondition($formCouponCd, $Customer);
+                        if (!$isAvailable && $existCoupon) {
+                            $form->get('coupon_cd')->addError(new FormError('front.plugin.coupon.shopping.notavailable'));
+                            $error = true;
+                        }
                     }
 
                     // クーポンが既に利用されているかチェック
