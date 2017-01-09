@@ -99,23 +99,28 @@ class CouponRepository extends EntityRepository
     }
     
     /**
-     * 会員が有効なクーポンを全取得する.
+     * 会員が選択可能なクーポンを全取得する.
      *
      * @return array
      */
-    public function findActiveCouponAllByCustomer(Application $app, Customer $Customer)
+    public function findSelectableCouponAllByCustomer(Application $app, Customer $Customer)
     {
         // 有効なクーポンを取得
         $ActiveCoupons = $this->findActiveCouponAll();
         
+        // 利用条件で絞り込み
         $ActiveCouponsByCustomer = array();
         foreach ($ActiveCoupons as $Coupon) {
             $isAvailable = $app['eccube.plugin.coupon.service.coupon']->checkCouponAvailableCondition($Coupon->getCouponCd(), $Customer);
-            if ($isAvailable) {
-                $ActiveCouponsByCustomer[] = $Coupon;
+            if (!$isAvailable) {
+                continue;
             }
+            if (!$Coupon->getSelectable()) {
+               continue;
+            }
+            $ActiveCouponsByCustomer[] = $Coupon;
         }
-        
+
         return $ActiveCouponsByCustomer;
     }
 }

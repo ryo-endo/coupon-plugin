@@ -274,7 +274,7 @@ class CouponController
         // 利用可能なクーポン一覧
         $Coupons = null;
         if ($app->isGranted('ROLE_USER')) {
-            $Coupons = $app['eccube.plugin.coupon.repository.coupon']->findActiveCouponAllByCustomer($app, $app->user());
+            $Coupons = $app['eccube.plugin.coupon.repository.coupon']->findSelectableCouponAllByCustomer($app, $app->user(), true);
         } else {
             //TODO 
         }

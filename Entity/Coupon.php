@@ -110,6 +110,12 @@ class Coupon extends AbstractEntity
      * @var int
      */
     private $coupon_lower_limit;
+    
+    
+    /**
+     * @var integer
+     */
+    private $selectable;
 
     /**
      * @var int
@@ -632,5 +638,28 @@ class Coupon extends AbstractEntity
     public function getNoExpireDate()
     {
         return $this->no_expire_date;
+    }
+
+    /**
+     * Set selectable
+     *
+     * @param integer $selectable
+     * @return Coupon
+     */
+    public function setSelectable($selectable)
+    {
+        $this->selectable = $selectable;
+
+        return $this;
+    }
+
+    /**
+     * Get selectable
+     *
+     * @return integer 
+     */
+    public function getSelectable()
+    {
+        return $this->selectable;
     }
 }

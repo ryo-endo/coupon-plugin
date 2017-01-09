@@ -79,6 +79,10 @@ Plugin\Coupon\Entity\Coupon:
         search_condition:
             type: text
             nullable: true
+        selectable:
+            type: smallint
+            nullable: false
+            default: '1'
         del_flg:
             type: smallint
             options:

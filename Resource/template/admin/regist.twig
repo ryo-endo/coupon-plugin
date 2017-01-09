@@ -420,6 +420,13 @@ $(function() {
                                 </div>
                             </div>
                         </div>
+                        {# クーポン選択欄に表示するか #}
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-9 col-lg-10">
+                                {{ form_widget(form.selectable) }}
+                                {{ form_errors(form.selectable) }}
+                            </div>
+                        </div>
                     </div>
                 </div><!-- /.box-body -->
             </div><!-- /.box -->

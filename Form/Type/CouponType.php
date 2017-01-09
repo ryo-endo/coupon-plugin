@@ -177,6 +177,11 @@ class CouponType extends AbstractType
                 'format' => 'yyyy-MM-dd',
                 'empty_value' => array('year' => '----', 'month' => '--', 'day' => '--'),
             ))
+            ->add('selectable', 'checkbox', array(
+                'label' => 'クーポン選択欄に表示する',
+                'value' => '1',
+                'required' => false,
+            ))
             ->add('coupon_release', 'integer', array(
                 'label' => '発行枚数',
                 'required' => true,
@@ -297,6 +302,7 @@ class CouponType extends AbstractType
         
         // 型変換(checkboxはbool型を要求するが、DBにはint型で保持しているため)
         $builder->get('no_expire_date')->addModelTransformer(new DataTransformer\IntegerToBooleanTransformer());
+        $builder->get('selectable')->addModelTransformer(new DataTransformer\IntegerToBooleanTransformer());
     }
 
     /**
